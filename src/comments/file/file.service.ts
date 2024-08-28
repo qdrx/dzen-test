@@ -10,8 +10,9 @@ export class FileService {
   private readonly _allowedImageTypes = ['jpg', 'png', 'gif'];
 
   async uploadFile(file: Express.Multer.File) {
-    const [_, fileExtention] = file.originalname.split('.');
-    if (this._allowedImageTypes.includes(fileExtention)) {
+    const fileNameParts = file.originalname.split('.');
+    const fileExtension = fileNameParts[fileNameParts.length - 1];
+    if (this._allowedImageTypes.includes(fileExtension)) {
       const { width, height } = await sharp(file.buffer).metadata();
       if (width > 320 || height > 240) {
         file.buffer = await sharp(file.buffer).resize(320, 240).toBuffer();
@@ -20,7 +21,7 @@ export class FileService {
     const newFilename = await this.generateFileName();
     const filePath = path.join(
       this._filePath,
-      newFilename + '.' + fileExtention,
+      newFilename + '.' + fileExtension,
     );
     fs.writeFile(filePath, file.buffer, (err) => {
       if (err) {
@@ -28,7 +29,7 @@ export class FileService {
         throw new BadRequestException('Error saving file');
       }
     });
-    return newFilename + '.' + fileExtention;
+    return newFilename + '.' + fileExtension;
   }
 
   async generateFileName() {
