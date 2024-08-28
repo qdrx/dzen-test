@@ -10,13 +10,13 @@ export class User {
   @Column({ unique: true })
   username: string;
 
-  @Column()
+  @Column({ select: false })
   @Exclude()
   password: string;
 
-  @OneToMany(() => Comment, (comment) => comment.author_id)
+  @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
 
-  @Column({ unique: true })
+  @Column({ unique: true, select: false })
   email: string;
 }

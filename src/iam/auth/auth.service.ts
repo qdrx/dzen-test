@@ -26,7 +26,10 @@ export class AuthService {
   }
 
   async signIn(dto: SignInDto) {
-    const user = await this.userRepo.findOneBy({ email: dto.email });
+    const user = await this.userRepo.findOne({
+      where: { email: dto.email },
+      select: ['password', 'email', 'id', 'username'],
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }

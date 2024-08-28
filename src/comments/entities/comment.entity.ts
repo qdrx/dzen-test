@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
@@ -19,7 +20,13 @@ export class Comment {
   attachment: string;
 
   @ManyToOne(() => User, (user) => user.comments)
-  author_id: number;
+  author: number | User;
+
+  @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true })
+  replyTo: Comment;
+
+  @OneToMany(() => Comment, (comment) => comment.replyTo)
+  replies: Comment[];
 
   @CreateDateColumn()
   created_at: Date;
