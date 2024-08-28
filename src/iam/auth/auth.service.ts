@@ -5,6 +5,7 @@ import { SignUpDto } from './dtos/sign-up.dto';
 import { User } from '../../users/entities/user.entity';
 import { SignInDto } from './dtos/sign-in.dto';
 import { UsersRepository } from '../../users/users.repository';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     private readonly userService: UsersService,
     private readonly userRepo: UsersRepository,
     private readonly hashingService: HashingService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async signUp(dto: SignUpDto) {
@@ -34,6 +36,12 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new NotFoundException('Invalid password');
     }
-    return user;
+    const token = await this.generateJwtToken(user);
+    return { user, token };
+  }
+
+  async generateJwtToken(user: User) {
+    const payload = { email: user.email, sub: user.id };
+    return this.jwtService.sign(payload);
   }
 }
