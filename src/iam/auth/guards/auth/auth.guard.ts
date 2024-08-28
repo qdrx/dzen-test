@@ -4,7 +4,6 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { TokenGuard } from '../token/token.guard';
 import { AuthType } from '../../enums/auth-type.enum';
