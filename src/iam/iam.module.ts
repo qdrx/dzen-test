@@ -7,6 +7,7 @@ import { AuthController } from './auth/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/guards/auth/auth.guard';
 import { TokenGuard } from './auth/guards/token/token.guard';
 
 @Module({
@@ -22,7 +23,8 @@ import { TokenGuard } from './auth/guards/token/token.guard';
   ],
   providers: [
     { provide: HashingService, useClass: BcryptService },
-    { provide: APP_GUARD, useClass: TokenGuard },
+    { provide: APP_GUARD, useClass: AuthGuard },
+    TokenGuard,
     AuthService,
   ],
   controllers: [AuthController],
