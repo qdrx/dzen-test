@@ -33,6 +33,7 @@ export class CommentsController {
           new MaxFileSizeValidator({ maxSize: 100000 }),
           new FileTypeValidator({ fileType: /(jpg|jpeg|gif|png)$/ }),
         ],
+        fileIsRequired: false,
       }),
     )
     file: Express.Multer.File,
