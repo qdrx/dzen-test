@@ -8,7 +8,10 @@ import {
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { SignInDto } from './dtos/sign-in.dto';
+import { Auth } from './decorators/auth.decorator';
+import { AuthType } from './enums/auth-type.enum';
 
+@Auth(AuthType.None)
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('auth')
 export class AuthController {
