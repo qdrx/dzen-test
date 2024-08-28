@@ -23,13 +23,14 @@ export class CommentsService {
     dto: CreateCommentDto,
     file?: Express.Multer.File,
   ) {
+    let filename = null;
     if (file) {
-      await this.fileService.uploadFile(file);
+      filename = await this.fileService.uploadFile(file);
     }
     const comment = new Comment();
     comment.author = user.sub;
     comment.content = dto.content;
-    comment.attachment = file ? file.filename : null;
+    comment.attachment = filename;
     comment.replyTo = dto.replyTo
       ? await this.commentRepo.findOne({ where: { id: dto.replyTo } })
       : null;
