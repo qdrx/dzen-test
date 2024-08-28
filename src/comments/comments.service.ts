@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CommentsRepository } from './comments.repository';
 import { CreateCommentDto } from './dtos/create-comment.dto';
 import { FileService } from './file/file.service';
+import { Comment } from './entities/comment.entity';
+import { ActiveUserData } from '../iam/interfaces/active-user-data.interface';
 
 @Injectable()
 export class CommentsService {
@@ -11,18 +13,26 @@ export class CommentsService {
   ) {}
 
   async getComments() {
-    return this.commentRepo.find();
+    return await this.commentRepo.find({
+      relations: ['author', 'replyTo'],
+    });
   }
 
-  async createComment(dto: CreateCommentDto, file?: Express.Multer.File) {
-    let filename = null;
+  async createComment(
+    user: ActiveUserData,
+    dto: CreateCommentDto,
+    file?: Express.Multer.File,
+  ) {
     if (file) {
-      filename = await this.fileService.uploadFile(file);
+      await this.fileService.uploadFile(file);
     }
-    const comment = this.commentRepo.create({
-      ...dto,
-      attachment: filename,
-    });
+    const comment = new Comment();
+    comment.author = user.sub;
+    comment.content = dto.content;
+    comment.attachment = file ? file.filename : null;
+    comment.replyTo = dto.replyTo
+      ? await this.commentRepo.findOne({ where: { id: dto.replyTo } })
+      : null;
     return this.commentRepo.save(comment);
   }
 }
