@@ -40,6 +40,10 @@ export class FileService {
     return nanoid();
   }
 
+  getFilePath() {
+    return this._filePath;
+  }
+
   async deleteFile(filename: string) {
     throw new Error('Not implemented');
   }
