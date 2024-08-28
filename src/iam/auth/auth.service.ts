@@ -6,6 +6,7 @@ import { User } from '../../users/entities/user.entity';
 import { SignInDto } from './dtos/sign-in.dto';
 import { UsersRepository } from '../../users/users.repository';
 import { JwtService } from '@nestjs/jwt';
+import { ActiveUserData } from '../interfaces/active-user-data.interface';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +42,11 @@ export class AuthService {
   }
 
   async generateJwtToken(user: User) {
-    const payload = { email: user.email, sub: user.id };
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      username: user.username,
+    } as ActiveUserData;
     return this.jwtService.sign(payload);
   }
 }
