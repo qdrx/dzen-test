@@ -1,10 +1,4 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Exclude } from 'class-transformer';
 
@@ -25,8 +19,4 @@ export class User {
 
   @Column({ unique: true })
   email: string;
-
-  constructor(entity: Partial<User>) {
-    Object.assign(this, entity);
-  }
 }
