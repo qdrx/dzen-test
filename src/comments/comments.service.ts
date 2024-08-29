@@ -15,13 +15,11 @@ export class CommentsService {
   ) {}
 
   async getCommentsByContent(content: string) {
-    const comments = await this.commentRepo.find({
+    return await this.commentRepo.find({
       where: { content: ILike(`%${content}%`) },
       relations: ['author', 'replyTo'],
       order: { created_at: 'ASC' },
     });
-
-    return comments;
   }
 
   async getComments() {
@@ -29,7 +27,6 @@ export class CommentsService {
       relations: ['author', 'replyTo'],
       order: { created_at: 'ASC' },
     });
-
     return await this.createCommentsTree(comments);
   }
 
