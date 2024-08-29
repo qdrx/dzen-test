@@ -18,5 +18,6 @@ import { SearchService } from './search.service';
   ],
   controllers: [],
   providers: [SearchService],
+  exports: [SearchService],
 })
 export class SearchModule {}
