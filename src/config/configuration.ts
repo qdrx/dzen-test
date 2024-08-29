@@ -14,4 +14,9 @@ export default () => ({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
   },
+  elastic: {
+    node: process.env.ELASTIC_NODE,
+    username: process.env.ELASTIC_USER,
+    password: process.env.ELASTIC_PASSWORD,
+  },
 });

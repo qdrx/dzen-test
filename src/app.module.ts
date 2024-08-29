@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { CommentsModule } from './comments/comments.module';
 import { IamModule } from './iam/iam.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { IamModule } from './iam/iam.module';
     UsersModule,
     CommentsModule,
     IamModule,
+    SearchModule,
   ],
   controllers: [],
   providers: [],

@@ -5,7 +5,7 @@ services:
     ports:
       - "${DATABASE_PORT}:5432"
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - postgres_dzen:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
       - POSTGRES_USER=${DATABASE_USER}
@@ -18,6 +18,27 @@ services:
       - postgres
     ports:
       - 8080:8080
+
+  elasticsearch:
+    container_name: "dzen_elasticsearch"
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_USER=${ELASTIC_USER}
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - esdata_dzen:/usr/share/elasticsearch/data
+
+  redis:
+    container_name: "dzen_redis"
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_dzen:/data
 
   api:
     container_name: "dzen_api"
@@ -36,4 +57,6 @@ services:
 
 
 volumes:
-  postgres:
+  postgres_dzen:
+  esdata_dzen:
+  redis_dzen:
