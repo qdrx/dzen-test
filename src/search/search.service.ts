@@ -18,6 +18,7 @@ export class SearchService {
     return await this.elasticService.index({
       index,
       document,
+      id: String(document['id']),
     });
   }
 }
