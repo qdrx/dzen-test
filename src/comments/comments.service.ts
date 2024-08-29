@@ -13,9 +13,36 @@ export class CommentsService {
   ) {}
 
   async getComments() {
-    return await this.commentRepo.find({
+    const comments = await this.commentRepo.find({
       relations: ['author', 'replyTo'],
+      order: { created_at: 'ASC' },
     });
+
+    return await this.createCommentsTree(comments);
+  }
+
+  async createCommentsTree(comments: Comment[]) {
+    const commentMap = new Map<number, Comment>();
+
+    comments.forEach((comment) => {
+      comment.replies = [];
+      commentMap.set(comment.id, comment);
+    });
+
+    const rootComments: Comment[] = [];
+
+    comments.forEach((comment) => {
+      if (comment.replyTo) {
+        const parentComment = commentMap.get(comment.replyTo.id);
+        if (parentComment) {
+          parentComment.replies.push(comment);
+        }
+      } else {
+        rootComments.push(comment);
+      }
+    });
+
+    return rootComments;
   }
 
   async createComment(
