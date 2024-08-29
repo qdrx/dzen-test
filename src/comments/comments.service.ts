@@ -4,6 +4,8 @@ import { CreateCommentDto } from './dtos/create-comment.dto';
 import { FileService } from './file/file.service';
 import { Comment } from './entities/comment.entity';
 import { ActiveUserData } from '../iam/interfaces/active-user-data.interface';
+import { ILike } from 'typeorm';
+import * as sanitizeHtml from 'sanitize-html';
 
 @Injectable()
 export class CommentsService {
@@ -11,6 +13,16 @@ export class CommentsService {
     private readonly commentRepo: CommentsRepository,
     private readonly fileService: FileService,
   ) {}
+
+  async getCommentsByContent(content: string) {
+    const comments = await this.commentRepo.find({
+      where: { content: ILike(`%${content}%`) },
+      relations: ['author', 'replyTo'],
+      order: { created_at: 'ASC' },
+    });
+
+    return comments;
+  }
 
   async getComments() {
     const comments = await this.commentRepo.find({
@@ -56,11 +68,21 @@ export class CommentsService {
     }
     const comment = new Comment();
     comment.author = user.sub;
-    comment.content = dto.content;
+    comment.content = this.sanitizeContent(dto.content);
     comment.attachment = filename;
     comment.replyTo = dto.replyTo
       ? await this.commentRepo.findOne({ where: { id: dto.replyTo } })
       : null;
     return this.commentRepo.save(comment);
+  }
+
+  private sanitizeContent(content: string) {
+    return sanitizeHtml(content, {
+      allowedTags: ['a', 'code', 'i', 'strong'],
+      allowedAttributes: {
+        a: ['href', 'title'],
+      },
+      allowedSchemes: ['http', 'https'],
+    });
   }
 }

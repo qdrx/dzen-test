@@ -6,6 +6,7 @@ import {
   MaxFileSizeValidator,
   ParseFilePipe,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -23,6 +24,11 @@ export class CommentsController {
   @Get()
   async getComments() {
     return this.commentsService.getComments();
+  }
+
+  @Get('search')
+  async findCommentsByContent(@Query('content') content: string) {
+    return this.commentsService.getCommentsByContent(content);
   }
 
   @Post()
