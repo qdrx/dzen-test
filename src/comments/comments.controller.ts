@@ -14,6 +14,7 @@ import { CreateCommentDto } from './dtos/create-comment.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ActiveUser } from '../iam/decorators/active-user.decorator';
+import { ActiveUserData } from '../iam/interfaces/active-user-data.interface';
 
 @Controller('comments')
 export class CommentsController {
@@ -27,7 +28,7 @@ export class CommentsController {
   @Post()
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   async createComment(
-    @ActiveUser() user,
+    @ActiveUser() user: ActiveUserData,
     @Body() dto: CreateCommentDto,
     @UploadedFile(
       new ParseFilePipe({
