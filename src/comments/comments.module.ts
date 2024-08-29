@@ -5,9 +5,10 @@ import { CommentsService } from './comments.service';
 import { CommentsRepository } from './comments.repository';
 import { CommentsController } from './comments.controller';
 import { FileModule } from './file/file.module';
+import { SearchModule } from '../search/search.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comment]), FileModule],
+  imports: [TypeOrmModule.forFeature([Comment]), FileModule, SearchModule],
   controllers: [CommentsController],
   providers: [CommentsService, CommentsRepository],
 })

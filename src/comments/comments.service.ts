@@ -6,20 +6,34 @@ import { Comment } from './entities/comment.entity';
 import { ActiveUserData } from '../iam/interfaces/active-user-data.interface';
 import { ILike } from 'typeorm';
 import * as sanitizeHtml from 'sanitize-html';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { SearchService } from '../search/search.service';
+import { CommentCreatedEvent } from './events/comment-created.event';
 
 @Injectable()
 export class CommentsService {
   constructor(
     private readonly commentRepo: CommentsRepository,
     private readonly fileService: FileService,
+    private eventEmitter: EventEmitter2,
+    private readonly searchService: SearchService,
   ) {}
 
   async getCommentsByContent(content: string) {
-    return await this.commentRepo.find({
-      where: { content: ILike(`%${content}%`) },
-      relations: ['author', 'replyTo'],
-      order: { created_at: 'ASC' },
+    const foundMatches = await this.searchService.search('comments', {
+      wildcard: { content: `*${content}*` },
     });
+    let comments: Comment[] = foundMatches.hits.hits.map(
+      (hit) => hit._source as Comment,
+    );
+    if (comments.length === 0) {
+      comments = await this.commentRepo.find({
+        where: { content: ILike(`%${content}%`) },
+        relations: ['author', 'replyTo'],
+        order: { created_at: 'ASC' },
+      });
+    }
+    return await this.getCommentsTree(comments);
   }
 
   async getComments() {
@@ -27,10 +41,10 @@ export class CommentsService {
       relations: ['author', 'replyTo'],
       order: { created_at: 'ASC' },
     });
-    return await this.createCommentsTree(comments);
+    return await this.getCommentsTree(comments);
   }
 
-  async createCommentsTree(comments: Comment[]) {
+  async getCommentsTree(comments: Comment[]) {
     const commentMap = new Map<number, Comment>();
 
     comments.forEach((comment) => {
@@ -70,7 +84,12 @@ export class CommentsService {
     comment.replyTo = dto.replyTo
       ? await this.commentRepo.findOne({ where: { id: dto.replyTo } })
       : null;
-    return this.commentRepo.save(comment);
+    const newComment: Comment = await this.commentRepo.save(comment);
+    this.eventEmitter.emit(
+      'comment.created',
+      new CommentCreatedEvent(newComment),
+    );
+    return newComment;
   }
 
   private sanitizeContent(content: string) {
@@ -81,5 +100,10 @@ export class CommentsService {
       },
       allowedSchemes: ['http', 'https'],
     });
+  }
+
+  @OnEvent('comment.created', { async: true })
+  async handleCommentCreated(payload: CommentCreatedEvent) {
+    await this.searchService.index('comments', payload.comment);
   }
 }
