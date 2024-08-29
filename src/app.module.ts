@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { CommentsModule } from './comments/comments.module';
 import { IamModule } from './iam/iam.module';
 import { SearchModule } from './search/search.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SearchModule } from './search/search.module';
       }),
       inject: [ConfigService],
     }),
+    EventEmitterModule.forRoot(),
     UsersModule,
     CommentsModule,
     IamModule,
