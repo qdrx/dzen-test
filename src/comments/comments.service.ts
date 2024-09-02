@@ -65,7 +65,7 @@ export class CommentsService {
       }
     });
 
-    return rootComments;
+    return rootComments.reverse();
   }
 
   async createComment(
