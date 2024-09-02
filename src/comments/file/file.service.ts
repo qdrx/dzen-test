@@ -9,6 +9,12 @@ export class FileService {
   private readonly _filePath = path.join(__dirname, '../../..', 'uploads');
   private readonly _allowedImageTypes = ['jpg', 'png', 'gif'];
 
+  constructor() {
+    if (!fs.existsSync(this._filePath)) {
+      fs.mkdirSync(this._filePath, { recursive: true });
+    }
+  }
+
   async uploadFile(file: Express.Multer.File) {
     const fileNameParts = file.originalname.split('.');
     const fileExtension = fileNameParts[fileNameParts.length - 1];
