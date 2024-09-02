@@ -30,11 +30,13 @@ import * as redisStore from 'cache-manager-redis-store';
       inject: [ConfigService],
     }),
     CacheModule.registerAsync({
+      isGlobal: true,
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         store: redisStore,
         host: configService.get('redis.host'),
         port: configService.get('redis.port'),
+        ttl: 30,
       }),
       inject: [ConfigService],
     }),

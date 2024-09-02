@@ -20,6 +20,7 @@ import { ActiveUserData } from '../iam/interfaces/active-user-data.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Response } from 'express';
 import { CommentCreatedEvent } from './events/comment-created.event';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('comments')
 export class CommentsController {
@@ -40,11 +41,13 @@ export class CommentsController {
     });
   }
 
+  @UseInterceptors(CacheInterceptor)
   @Get()
   async getComments() {
     return this.commentsService.getComments();
   }
 
+  @UseInterceptors(CacheInterceptor)
   @Get('search')
   async findCommentsByContent(@Query('content') content: string) {
     return this.commentsService.getCommentsByContent(content);
