@@ -15,7 +15,6 @@ import { TokenGuard } from './auth/guards/token/token.guard';
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get('jwt.secret'),
-        signOptions: { expiresIn: configService.get('jwt.ttl') },
       }),
       inject: [ConfigService],
     }),
