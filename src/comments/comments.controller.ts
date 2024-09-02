@@ -7,6 +7,7 @@ import {
   ParseFilePipe,
   Post,
   Query,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,10 +17,28 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ActiveUser } from '../iam/decorators/active-user.decorator';
 import { ActiveUserData } from '../iam/interfaces/active-user-data.interface';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Response } from 'express';
+import { CommentCreatedEvent } from './events/comment-created.event';
 
 @Controller('comments')
 export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(
+    private readonly commentsService: CommentsService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
+
+  @Get('connect')
+  async getNewComments(@Res() res: Response) {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+    });
+    this.eventEmitter.on('comment.created', (message: CommentCreatedEvent) => {
+      res.write(`data: ${JSON.stringify(message.comment)} \n\n`);
+    });
+  }
 
   @Get()
   async getComments() {
