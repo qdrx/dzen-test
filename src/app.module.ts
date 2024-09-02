@@ -7,6 +7,8 @@ import { CommentsModule } from './comments/comments.module';
 import { IamModule } from './iam/iam.module';
 import { SearchModule } from './search/search.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -24,6 +26,15 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
         database: configService.get('database.database'),
         autoLoadEntities: true,
         synchronize: true,
+      }),
+      inject: [ConfigService],
+    }),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        store: redisStore,
+        host: configService.get('redis.host'),
+        port: configService.get('redis.port'),
       }),
       inject: [ConfigService],
     }),

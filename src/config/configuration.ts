@@ -19,4 +19,8 @@ export default () => ({
     username: process.env.ELASTIC_USER,
     password: process.env.ELASTIC_PASSWORD,
   },
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+  },
 });
