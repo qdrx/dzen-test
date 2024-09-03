@@ -20,13 +20,14 @@ export class CommentsService {
   ) {}
 
   async getCommentsByContent(content: string) {
-    const foundMatches = await this.searchService.search('comments', {
-      wildcard: { content: `*${content}*` },
-    });
-    let comments: Comment[] = foundMatches.hits.hits.map(
-      (hit) => hit._source as Comment,
-    );
-    if (comments.length === 0) {
+    let comments: Comment[];
+    try {
+      const foundMatches = await this.searchService.search('comments', {
+        wildcard: { content: `*${content}*` },
+      });
+      comments = foundMatches.hits.hits.map((hit) => hit._source as Comment);
+    } catch (error) {
+      console.error(error);
       comments = await this.commentRepo.find({
         where: { content: ILike(`%${content}%`) },
         relations: ['author', 'replyTo'],
@@ -78,6 +79,7 @@ export class CommentsService {
       filename = await this.fileService.uploadFile(file);
     }
     const comment = new Comment();
+    console.log(user);
     comment.author = user.sub;
     comment.content = this.sanitizeContent(dto.content);
     comment.attachment = filename;
