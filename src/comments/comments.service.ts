@@ -79,8 +79,8 @@ export class CommentsService {
       filename = await this.fileService.uploadFile(file);
     }
     const comment = new Comment();
-    console.log(user);
     comment.author = user.sub;
+    comment.username = user.username;
     comment.content = this.sanitizeContent(dto.content);
     comment.attachment = filename;
     comment.replyTo = dto.replyTo

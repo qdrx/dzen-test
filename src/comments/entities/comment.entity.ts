@@ -19,6 +19,9 @@ export class Comment {
   @Column({ default: null })
   attachment: string;
 
+  @Column({ default: null, nullable: true })
+  username: string;
+
   @ManyToOne(() => User, (user) => user.comments)
   author: number | User;
 

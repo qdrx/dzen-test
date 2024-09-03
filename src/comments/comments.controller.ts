@@ -114,13 +114,66 @@ export class CommentsController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 100000 }),
-          new FileTypeValidator({ fileType: /(jpg|jpeg|gif|png)$/ }),
+          new FileTypeValidator({
+            fileType: 'text/plain|image/jpeg|image/gif',
+          }),
         ],
         fileIsRequired: false,
       }),
     )
     file: Express.Multer.File,
   ): Promise<Comment> {
+    if (!user) {
+      user = { sub: null, username: dto.username, email: dto.email };
+    }
+    return this.commentsService.createComment(user, dto, file);
+  }
+
+  @Auth(AuthType.None)
+  @Post('anonymous')
+  @ApiOperation({ summary: 'Create a new comment without registration' })
+  @ApiResponse({
+    status: 201,
+    description: 'The comment has been successfully created.',
+    type: Comment,
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Create Comment DTO',
+    schema: {
+      type: 'object',
+      properties: {
+        content: { type: 'string', example: 'This is <i>my</i> comment' },
+        replyTo: {
+          type: 'number',
+          example: 1,
+          description:
+            'ID of the comment to reply to, if not valid returns null',
+        },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  async createCommentAnonymous(
+    @Body() dto: CreateCommentDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 100000 }),
+          new FileTypeValidator({
+            fileType: 'text/plain|image/jpeg|image/gif',
+          }),
+        ],
+        fileIsRequired: false,
+      }),
+    )
+    file: Express.Multer.File,
+  ): Promise<Comment> {
+    const user = { sub: null, username: dto.username, email: dto.email };
     return this.commentsService.createComment(user, dto, file);
   }
 }
