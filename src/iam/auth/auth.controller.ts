@@ -11,7 +11,6 @@ import { SignInDto } from './dtos/sign-in.dto';
 import { Auth } from './decorators/auth.decorator';
 import { AuthType } from './enums/auth-type.enum';
 import { ApiResponse } from '@nestjs/swagger';
-import { User } from '../../users/entities/user.entity';
 
 @Auth(AuthType.None)
 @UseInterceptors(ClassSerializerInterceptor)
