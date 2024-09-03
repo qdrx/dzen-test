@@ -26,12 +26,12 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
-  ApiProperty,
   ApiResponse,
 } from '@nestjs/swagger';
 import { Auth } from '../iam/auth/decorators/auth.decorator';
 import { AuthType } from '../iam/auth/enums/auth-type.enum';
 
+@Auth(AuthType.None)
 @Controller('comments')
 export class CommentsController {
   constructor(
@@ -39,7 +39,6 @@ export class CommentsController {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  @Auth(AuthType.None)
   @Get('connect')
   @ApiOperation({ summary: 'Get new comments via Server-Sent Events (SSE)' })
   @ApiResponse({
@@ -65,15 +64,13 @@ export class CommentsController {
     });
   }
 
-  @Auth(AuthType.None)
-  @UseInterceptors(CacheInterceptor)
   @Get()
+  @UseInterceptors(CacheInterceptor)
   @ApiOperation({ summary: 'Get all comments' })
   async getComments(): Promise<Comment[]> {
     return this.commentsService.getComments();
   }
 
-  @Auth(AuthType.None)
   @UseInterceptors(CacheInterceptor)
   @Get('search')
   @ApiOperation({ summary: 'Search comments by content (partial)' })
@@ -81,7 +78,7 @@ export class CommentsController {
     return this.commentsService.getCommentsByContent(content);
   }
 
-  @Auth(AuthType.None)
+  @Auth(AuthType.Bearer)
   @Post()
   @ApiOperation({ summary: 'Create a new comment' })
   @ApiResponse({
